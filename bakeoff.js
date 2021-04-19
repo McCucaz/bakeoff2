@@ -75,6 +75,9 @@ var firebaseConfig = {
       textAlign(LEFT);
       text("Trial " + (current_trial + 1) + " of " + trials.length, 50, 20);
       
+      if (current_trial === 0) {
+        text("Click on the first green ball to start.",width/2 - textWidth("Click on the first green ball to start.")/2, height/4);
+      }
       // Draw all 16 targets
       for (var i = 0; i < 16; i++) drawTarget(i);
     }
@@ -119,13 +122,14 @@ var firebaseConfig = {
     text("Average time per target: " + time_per_target + "s", width/2, 180);
     text("Average time for each target (+ penalty): " + target_w_penalty + "s", width/2, 220);
     if (attempt == 1) {
-      text("Se tiver alguma sugestão/crítica que aumente o seu desempenho, por favor indique-a abaixo.", width/2, 290);
+      
+      text("If you have any suggestions or advices that would increase your performance, please write them down below.", width/2, 290)
+      //text("Se tiver alguma sugestão/crítica que aumente o seu desempenho, por favor indique-a abaixo.", width/2, 290);
       comments_input = createInput('');                                 // create input field
       comments_input.position(width/2-200, 320);
       comments_input.size(400,30);
       submit_button = createButton('SUBMIT');
-      submit_button.size(30,15)
-      submit_button.position(width/2 - 15, height/2 - submit_button.size().height/2);
+      submit_button.position(width/2 - submit_button.width/2, height/2 - submit_button.size().height/2);
       submit_button.mouseReleased(thank);
     }
     // Print Fitts IDS (one per target, -1 if failed selection)
@@ -180,6 +184,11 @@ var firebaseConfig = {
       else misses++;
       
       current_trial++;                 // Move on to the next trial/target
+
+      if (current_trial === 1) {
+        testStartTime = millis();
+        ellipse(width/2, height/4,width,30);
+      }
       
       // Check if the user has completed all 48 trials
       if (current_trial === trials.length)
@@ -274,7 +283,6 @@ var firebaseConfig = {
     
     // Shows the targets again
     draw_targets = true;
-    testStartTime = millis();  
   }
   
   // Is invoked when the canvas is resized (e.g., when we go fullscreen)
