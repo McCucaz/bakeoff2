@@ -16,6 +16,12 @@ canvas
   color: white;
 }
 
+#game_goal_label {
+  font-size: 16px;
+  font-family: 'Arial';
+  color: white;
+}
+
 #input
 {
   font-size: 14px;

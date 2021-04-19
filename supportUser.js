@@ -12,6 +12,11 @@ function drawUserIDScreen()
   main_text = createDiv("Insira o seu nome e o tamanho do seu monitor em polegadas");
   main_text.id('main_text');
   main_text.position(10, 10);
+
+  // Game Goal
+  game_goal_label = createDiv("Press the green balls the fastest you can!");
+  game_goal_label.id('game_goal_label');
+  game_goal_label.position(190, 180);
   
   // Input forms:
   // 1. Student ID
@@ -33,7 +38,7 @@ function drawUserIDScreen()
   display_size_label = createDiv("Polegadas do Monitor:");   // create label
   display_size_label.id('input');
   display_size_label.position(10, display_size_pos_y_offset);
-  
+
   // 3. Start button
   start_button = createButton('START');
   start_button.mouseReleased(startTest);
@@ -79,6 +84,7 @@ function startTest()
     student_ID_label.remove();
     display_size_form.remove();
     display_size_label.remove();
+    game_goal_label.remove();
     start_button.remove();  
 
     // Goes fullscreen and starts test

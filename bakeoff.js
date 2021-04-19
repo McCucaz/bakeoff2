@@ -34,6 +34,10 @@ var firebaseConfig = {
   let current_trial    = 0;      // the current trial number (indexes into trials array above)
   let attempt          = 0;      // users complete each test twice to account for practice (attemps 0 and 1)
   let fitts_IDs        = [];     // add the Fitts ID for each selection here (-1 when there is a miss)
+
+  // Feedback
+  let comments_input;
+  let submit_button;
   
   // Target class (position and width)
   class Target
@@ -76,6 +80,21 @@ var firebaseConfig = {
     }
   }
   
+  function thank() {
+    let opinion = comments_input.value()
+    submit_button.remove();
+    comments_input.remove();
+    text("Thank you for your participation!",width/2, height/2 - submit_button.size().height/2);
+    
+    let c = color(0, 0, 0);
+    fill(c);
+    noStroke();
+    ellipse(width/2,290,width,40,1);
+
+    let db_ref = database.ref("Opinions");
+    db_ref.push(opinion);
+  }
+
   // Print and save results at the end of 48 trials
   function printAndSavePerformance()
   {
@@ -99,7 +118,16 @@ var firebaseConfig = {
     text("Total time taken: " + test_time + "s", width/2, 160);
     text("Average time per target: " + time_per_target + "s", width/2, 180);
     text("Average time for each target (+ penalty): " + target_w_penalty + "s", width/2, 220);
-    
+    if (attempt == 1) {
+      text("Se tiver alguma sugestão/crítica que aumente o seu desempenho, por favor indique-a abaixo.", width/2, 290);
+      comments_input = createInput('');                                 // create input field
+      comments_input.position(width/2-200, 320);
+      comments_input.size(400,30);
+      submit_button = createButton('SUBMIT');
+      submit_button.size(30,15)
+      submit_button.position(width/2 - 15, height/2 - submit_button.size().height/2);
+      submit_button.mouseReleased(thank);
+    }
     // Print Fitts IDS (one per target, -1 if failed selection)
     // 
   
@@ -118,6 +146,7 @@ var firebaseConfig = {
           target_w_penalty:   target_w_penalty,
           fitts_IDs:          fitts_IDs
     }
+
     
     // Send data to DB (DO NOT CHANGE!)
     if (BAKE_OFF_DAY)
@@ -130,7 +159,7 @@ var firebaseConfig = {
       }
       
       // Add user performance results
-      let db_ref = database.ref("First Iteration");
+      let db_ref = database.ref("Second Iteration");
       db_ref.push(attempt_data);
     }
   }
