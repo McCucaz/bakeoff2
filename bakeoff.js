@@ -76,7 +76,7 @@ var firebaseConfig = {
       text("Trial " + (current_trial + 1) + " of " + trials.length, 50, 20);
       
       if (current_trial === 0) {
-        text("Click on the first green ball to start.",width/2 - textWidth("Click on the first green ball to start.")/2, height/4);
+        text("Click on the first green ball to start.",width/2 - textWidth("Click on the first green ball to start.")/2, 60+display_size*3);
       }
       // Draw all 16 targets
       for (var i = 0; i < 16; i++) drawTarget(i);
