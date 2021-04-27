@@ -40,16 +40,14 @@ var firebaseConfig = {
   let submit_button;
   //let retry_button;
 
-  let sound;
   let miss1;
   let miss2;
   let miss3;
   let miss4;
   let miss5;
+  let video;
 
   function preload() {
-    sound = loadSound("rickroll.mp3");
-    sound.setVolume(0.1);
     miss1 = loadSound("guitarHeroFailed1.mp3");
     miss2 = loadSound("guitarHeroFailed2.mp3");
     miss3 = loadSound("guitarHeroFailed3.mp3");
@@ -97,11 +95,13 @@ var firebaseConfig = {
   {
     createCanvas(700, 500);    // window size in px before we go into fullScreen()
     frameRate(60);             // frame rate (DO NOT CHANGE!)
-    
     randomizeTrials();         // randomize the trial order at the start of execution
-    
+    cursor("cursor2.png",36/2,36/2);
     textFont("Arial", 18);     // font size for the majority of the text
     drawUserIDScreen();        // draws the user input screen (student number and display size)
+    video = createVideo("rickrollvid.mp4");
+    video.hide();
+    video.volume(0.1);
   }
   
   // Runs every frame and redraws the screen
@@ -110,16 +110,18 @@ var firebaseConfig = {
     if (draw_targets)
     {
       // The user is interacting with the 4x4 target grid
-      background(color(0,0,0));        // sets background to black
+      background(color(255,255,255));        // sets background to black
       
       // Print trial count at the top left-corner of the canvas
-      fill(color(255,255,255));
-      textAlign(LEFT);
-      text("Trial " + (current_trial + 1) + " of " + trials.length, 50, 20);
       
       if (current_trial === 0) {
         text("Click on the first green ball to start.",width/2 - textWidth("Click on the first green ball to start.")/2, 60+display_size*3);
       }
+      else image(video,0,0);
+
+      fill(color(255,255,255));
+      textAlign(LEFT);
+      text("Trial " + (current_trial + 1) + " of " + trials.length, 50, 20);
       // Draw all 16 targets
       for (var i = 0; i < 16; i++) drawTarget(i);
     }
@@ -245,18 +247,18 @@ var firebaseConfig = {
       // increasing either the 'hits' or 'misses' counters
       if (dist(target.x, target.y, mouseX, mouseY) < target.w/2) {
         hits++;
-          sound.setVolume(0.1);
+        video.volume(0.1);
       }
       else {
         misses++;
         playRandomMiss();
-        sound.setVolume(0.01);
+        video.volume(0.01);
       }
       current_trial++;                 // Move on to the next trial/target
-
+      
       if (current_trial === 1) {
         testStartTime = millis();
-        sound.play();
+        video.play();
         ellipse(width/2, height/4,width,30);
       }
       
@@ -267,7 +269,6 @@ var firebaseConfig = {
         draw_targets = false;          // Stop showing targets and the user performance results
         printAndSavePerformance();     // Print the user's results on-screen and send these to the DB
         attempt++;                      
-        sound.stop();
         // If there's an attempt to go create a button to start this
         if (attempt < 2)
         {
@@ -278,10 +279,6 @@ var firebaseConfig = {
       } 
     }
   }
-  
-  function changeMouse() {
-    cursor(HAND);
-  }
 
   // Draw target on-screen
   function drawTarget(i)
@@ -291,20 +288,24 @@ var firebaseConfig = {
   
     // Check whether this target is the target the user should be trying to select
     if (trials[current_trial] == i) 
-    { 
+    {
+      fill(color(224, 202, 60));
       // Highlights the target the user should be trying to select
       // with a white border
       if (trials[current_trial + 1 ] == i) {
-        stroke(color(220,0,0));
-        strokeWeight(5);
+        stroke(color(217, 196, 76));
+        strokeWeight(6);
       }
       else {
         noStroke();
       }
-      fill(color(0,220,0));                 
       let c = circle(target.x, target.y, target.w);
+      if (dist(target.x, target.y, mouseX, mouseY) < target.w/2) {
+        fill(color(196, 178, 122));
+        let c = circle(target.x, target.y, target.w);
+      }
 
-      // Remember you are allowed to access targets (i-1) and (i+1)
+      // Remember you are allowed to access  targets (i-1) and (i+1)
       // if this is the target the user should be trying to select
       //
     }
@@ -312,9 +313,9 @@ var firebaseConfig = {
     { 
       // Highlights the target the user should be trying to select
       // with a white border
-      stroke(color(220,0,0));
-      strokeWeight(5);
-      fill(color(155,155,155));                 
+      stroke(color(217, 196, 76));
+      strokeWeight(6);
+      fill(color(135, 167, 176));
       circle(target.x, target.y, target.w);
       
       // Remember you are allowed to access targets (i-1) and (i+1)
@@ -325,11 +326,17 @@ var firebaseConfig = {
       noStroke();
       // Does not draw a border if this is not the target the user
       // should be trying to select
-      fill(color(155,155,155));                 
+      fill(color(135, 167, 176));
       circle(target.x, target.y, target.w);
       // Draws the target
     }
-    
+
+    if (i == trials[current_trial] && i == trials[current_trial + 1]) {
+      //noStroke();
+      fill(color(255, 255, 255));
+      textAlign(CENTER, CENTER);
+      text('x2', target.x, target.y);
+    }
   }
   
   // Returns the location and size of a given target
