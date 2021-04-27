@@ -38,6 +38,48 @@ var firebaseConfig = {
   // Feedback
   let comments_input;
   let submit_button;
+  //let retry_button;
+
+  let sound;
+  let miss1;
+  let miss2;
+  let miss3;
+  let miss4;
+  let miss5;
+
+  function preload() {
+    sound = loadSound("rickroll.mp3");
+    sound.setVolume(0.1);
+    miss1 = loadSound("guitarHeroFailed1.mp3");
+    miss2 = loadSound("guitarHeroFailed2.mp3");
+    miss3 = loadSound("guitarHeroFailed3.mp3");
+    miss4 = loadSound("guitarHeroFailed4.mp3");
+    miss5 = loadSound("guitarHeroFailed5.mp3");
+  }
+
+  function playRandomMiss() {
+    var toPlay = random(0,4.99);
+    toPlay = int(toPlay);
+    switch (toPlay) {
+      case 0:
+        miss1.play();
+        break;
+      case 1:
+        miss2.play();
+        break;
+      case 2:
+        miss3.play();
+        break;
+      case 3:
+        miss4.play();
+        break;
+      case 4:
+        miss4.play();
+        break;
+      default:
+        break;
+    }
+  }
   
   // Target class (position and width)
   class Target
@@ -130,6 +172,9 @@ var firebaseConfig = {
       submit_button = createButton('SUBMIT');
       submit_button.position(width/2 - submit_button.width/2, 900);
       submit_button.mouseReleased(thank);
+      //retry_button = createButton("RETRY");
+      //retry_button.position(width/2 - retry_button.width/2, 780);
+      //retry_button.mouseReleased(continueTest);
     }
     // Print Fitts IDS (one per target, -1 if failed selection)
     // 
@@ -166,7 +211,7 @@ var firebaseConfig = {
       db_ref.push(attempt_data);
     }
 
-    if (attempt === 1)
+    if (attempt >= 1)
     {
       var topUserPostsRef = firebase.database().ref("Second Iteration").orderByChild('target_w_penalty').limitToFirst(10);
       text ("Leaderboards", width/2, 280)
@@ -181,9 +226,11 @@ var firebaseConfig = {
               yIncrease += 25;
           });
       });
+      attempt++;
     }
   }
   
+
   // Mouse button was pressed - lets test to see if hit was in the correct target
   function mousePressed() 
   {
@@ -196,13 +243,20 @@ var firebaseConfig = {
       
       // Check to see if the mouse cursor is inside the target bounds,
       // increasing either the 'hits' or 'misses' counters
-      if (dist(target.x, target.y, mouseX, mouseY) < target.w/2)  hits++;                                                       
-      else misses++;
-      
+      if (dist(target.x, target.y, mouseX, mouseY) < target.w/2) {
+        hits++;
+          sound.setVolume(0.1);
+      }
+      else {
+        misses++;
+        playRandomMiss();
+        sound.setVolume(0.01);
+      }
       current_trial++;                 // Move on to the next trial/target
 
       if (current_trial === 1) {
         testStartTime = millis();
+        sound.play();
         ellipse(width/2, height/4,width,30);
       }
       
@@ -213,7 +267,7 @@ var firebaseConfig = {
         draw_targets = false;          // Stop showing targets and the user performance results
         printAndSavePerformance();     // Print the user's results on-screen and send these to the DB
         attempt++;                      
-        
+        sound.stop();
         // If there's an attempt to go create a button to start this
         if (attempt < 2)
         {
@@ -225,6 +279,10 @@ var firebaseConfig = {
     }
   }
   
+  function changeMouse() {
+    cursor(HAND);
+  }
+
   // Draw target on-screen
   function drawTarget(i)
   {
@@ -244,7 +302,8 @@ var firebaseConfig = {
         noStroke();
       }
       fill(color(0,220,0));                 
-      circle(target.x, target.y, target.w);
+      let c = circle(target.x, target.y, target.w);
+
       // Remember you are allowed to access targets (i-1) and (i+1)
       // if this is the target the user should be trying to select
       //
