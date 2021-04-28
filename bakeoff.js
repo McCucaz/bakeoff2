@@ -110,7 +110,7 @@ var firebaseConfig = {
     if (draw_targets)
     {
       // The user is interacting with the 4x4 target grid
-      background(color(255,255,255));        // sets background to black
+      background(color(0,0,0));        // sets background to black
       
       // Print trial count at the top left-corner of the canvas
       
@@ -121,9 +121,19 @@ var firebaseConfig = {
 
       fill(color(255,255,255));
       textAlign(LEFT);
+      noStroke();
       text("Trial " + (current_trial + 1) + " of " + trials.length, 50, 20);
       // Draw all 16 targets
       for (var i = 0; i < 16; i++) drawTarget(i);
+      if (current_trial+1 < trials.length && trials[current_trial] != trials[current_trial+1]) {
+        let nextTarget = getTargetBounds(trials[current_trial+1]);
+        let target = getTargetBounds(trials[current_trial]);
+        let v0 = createVector(target.x, target.y);
+        let v1 = createVector(nextTarget.x, nextTarget.y);
+        stroke(color(255, 255, 255));
+        strokeWeight(3);
+        line(v0.x, v0.y, v1.x,v1.y);
+      }
     }
   }
   
@@ -304,7 +314,6 @@ var firebaseConfig = {
         fill(color(196, 178, 122));
         let c = circle(target.x, target.y, target.w);
       }
-
       // Remember you are allowed to access  targets (i-1) and (i+1)
       // if this is the target the user should be trying to select
       //
