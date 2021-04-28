@@ -12,7 +12,12 @@ function drawUserIDScreen()
   main_text = createDiv("Insert your student number and display size");
   main_text.id('main_text');
   main_text.position(10, 10);
-  
+
+  // Game Goal
+  game_goal_label = createDiv("Press the Yellow circles the fastest you can!");
+  game_goal_label.id('game_goal_label');
+  game_goal_label.position(190, 180);
+
   // Input forms:
   // 1. Student ID
   let student_ID_pos_y_offset = main_text.size().height + 40;         // y offset from previous item

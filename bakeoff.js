@@ -4,16 +4,9 @@
 // Bake-off: durante os laboratórios da semana de 3 de Maio
 
 // p5.js reference: https://p5js.org/reference/
-
-var firebaseConfig = {
-    apiKey: "AIzaSyAXD8ZiSlhkJmddixMS1u_orycui6TPa3E",
-    authDomain: "bake-off-2-d4b75.firebaseapp.com",
-    databaseURL: "https://bake-off-2-d4b75-default-rtdb.europe-west1.firebasedatabase.app/",
-    storageBucket: "bake-off-2-d4b75.appspot.com"
-  };
   
   // Database (CHANGE THESE!)
-  const GROUP_NUMBER   = 1;      // Add your group number here as an integer (e.g., 2, 3)
+  const GROUP_NUMBER   = 46;      // Add your group number here as an integer (e.g., 2, 3)
   const BAKE_OFF_DAY   = true;  // Set to 'true' before sharing during the simulation and bake-off days
   
   // Target and grid properties (DO NOT CHANGE!)
@@ -232,7 +225,7 @@ var firebaseConfig = {
       }
       
       // Add user performance results
-      let db_ref = database.ref("Third Iteration");
+      let db_ref = database.ref("G46");
       db_ref.push(attempt_data);
     }
 
