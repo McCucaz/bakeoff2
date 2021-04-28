@@ -14,7 +14,7 @@ function drawUserIDScreen()
   main_text.position(width/6, 10);
 
   // Game Goal
-  game_goal_label = createDiv("Press the green balls the fastest you can!");
+  game_goal_label = createDiv("Press the Yellow circles the fastest you can!");
   game_goal_label.id('game_goal_label');
   game_goal_label.position(190, 180);
   

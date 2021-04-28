@@ -38,7 +38,7 @@ var firebaseConfig = {
   // Feedback
   let comments_input;
   let submit_button;
-  //let retry_button;
+  let retry_button;
 
   let miss1;
   let miss2;
@@ -104,6 +104,21 @@ var firebaseConfig = {
     video.volume(0.1);
   }
   
+  function drawArrow(base, vec, color, margin) {
+
+    let connectingVector = createVector(vec.x-base.x, vec.y-base.y);
+    let weight = 6;
+    stroke(color);
+    strokeWeight(weight);
+    fill(color);
+    translate(base.x, base.y);
+    rotate(connectingVector.heading());
+    line(0, 0, connectingVector.mag() - weight - margin, 0)
+    let arrowSize = 15;
+    translate(connectingVector.mag() - arrowSize - weight - margin, 0);
+    triangle(0, arrowSize / 2, 0, -arrowSize / 2, arrowSize, 0);
+  }
+
   // Runs every frame and redraws the screen
   function draw()
   {
@@ -115,7 +130,8 @@ var firebaseConfig = {
       // Print trial count at the top left-corner of the canvas
       
       if (current_trial === 0) {
-        text("Click on the first green ball to start.",width/2 - textWidth("Click on the first green ball to start.")/2, 60+display_size*3);
+        noStroke();
+        text("Click on the yellow ball to start.",width/2 - textWidth("Click on the first yellow ball to start.")/2, 60+display_size*3);
       }
       else image(video,0,0);
 
@@ -130,9 +146,7 @@ var firebaseConfig = {
         let target = getTargetBounds(trials[current_trial]);
         let v0 = createVector(target.x, target.y);
         let v1 = createVector(nextTarget.x, nextTarget.y);
-        stroke(color(255, 255, 255));
-        strokeWeight(3);
-        line(v0.x, v0.y, v1.x,v1.y);
+        drawArrow(v0, v1, "white", nextTarget.w/2);
       }
     }
   }
@@ -175,7 +189,7 @@ var firebaseConfig = {
     text("Total time taken: " + test_time + "s", width/2, 160);
     text("Average time per target: " + time_per_target + "s", width/2, 180);
     text("Average time for each target (+ penalty): " + target_w_penalty + "s", width/2, 220);
-    if (attempt == 1) {
+    if (attempt > 0) {
       
       text("If you have any suggestions or advices that would increase your performance, please write them down below.", width/2, 800);
       comments_input = createInput('');                                 // create input field
@@ -184,9 +198,9 @@ var firebaseConfig = {
       submit_button = createButton('SUBMIT');
       submit_button.position(width/2 - submit_button.width/2, 900);
       submit_button.mouseReleased(thank);
-      //retry_button = createButton("RETRY");
-      //retry_button.position(width/2 - retry_button.width/2, 780);
-      //retry_button.mouseReleased(continueTest);
+      retry_button = createButton("RETRY");
+      retry_button.position(width/2 - retry_button.width/2, 720);
+      retry_button.mouseReleased(continueTest);
     }
     // Print Fitts IDS (one per target, -1 if failed selection)
     // 
@@ -206,7 +220,6 @@ var firebaseConfig = {
           target_w_penalty:   target_w_penalty,
           fitts_IDs:          fitts_IDs
     }
-
     
     // Send data to DB (DO NOT CHANGE!)
     if (BAKE_OFF_DAY)
@@ -219,13 +232,13 @@ var firebaseConfig = {
       }
       
       // Add user performance results
-      let db_ref = database.ref("Second Iteration");
+      let db_ref = database.ref("Third Iteration");
       db_ref.push(attempt_data);
     }
 
     if (attempt >= 1)
     {
-      var topUserPostsRef = firebase.database().ref("Second Iteration").orderByChild('target_w_penalty').limitToFirst(10);
+      var topUserPostsRef = firebase.database().ref("Third Iteration").orderByChild('target_w_penalty').limitToFirst(10);
       text ("Leaderboards", width/2, 280)
       var yIncrease = 25;
       var places = 1;
@@ -238,14 +251,17 @@ var firebaseConfig = {
               yIncrease += 25;
           });
       });
-      attempt++;
     }
   }
   
+  function mouseReleased() {
+    cursor("cursor2.png",36/2,36/2);
+  }
 
   // Mouse button was pressed - lets test to see if hit was in the correct target
   function mousePressed() 
   {
+    cursor("cursor3.png",40/2,40/2);
     // Only look for mouse releases during the actual test
     // (i.e., during target selections)
     if (draw_targets)
@@ -371,6 +387,11 @@ var firebaseConfig = {
     fitts_IDs = [];
     
     continue_button.remove();
+    if (attempt > 1) {
+      retry_button.remove();
+      submit_button.remove();
+      comments_input.remove();
+    }
     
     // Shows the targets again
     draw_targets = true;
