@@ -86,7 +86,8 @@ function startTest()
     display_size_label.remove();
     game_goal_label.remove();
     start_button.remove();  
-
+    testStartTime = millis();
+    
     // Goes fullscreen and starts test
     fullscreen(!fullscreen());
   }
