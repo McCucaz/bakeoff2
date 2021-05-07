@@ -342,9 +342,7 @@ function drawTarget(i)
     if (dist(target.x, target.y, mouseX, mouseY) < target.w/2) {
       fill(color(196, 178, 122));
       circle(target.x, target.y, target.w);
-      cursor(HAND);
     }
-    else cursor(ARROW);
     // Remember you are allowed to access  targets (i-1) and (i+1)
     // if this is the target the user should be trying to select
     //
