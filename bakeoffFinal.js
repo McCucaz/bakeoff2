@@ -5,16 +5,9 @@
 
 // p5.js reference: https://p5js.org/reference/
 
-var firebaseConfig = {
-  apiKey: "AIzaSyAXD8ZiSlhkJmddixMS1u_orycui6TPa3E",
-  authDomain: "bake-off-2-d4b75.firebaseapp.com",
-  databaseURL: "https://bake-off-2-d4b75-default-rtdb.europe-west1.firebasedatabase.app/",
-  storageBucket: "bake-off-2-d4b75.appspot.com"
-};
-
 // Database (CHANGE THESE!)
-const GROUP_NUMBER   = 1;      // Add your group number here as an integer (e.g., 2, 3)
-const BAKE_OFF_DAY   = true;  // Set to 'true' before sharing during the simulation and bake-off days
+const GROUP_NUMBER   = 46;      // Add your group number here as an integer (e.g., 2, 3)
+const BAKE_OFF_DAY   = false;  // Set to 'true' before sharing during the simulation and bake-off days
 
 // Target and grid properties (DO NOT CHANGE!)
 let PPI, PPCM;
@@ -40,22 +33,29 @@ let comments_input;
 let submit_button;
 let retry_button;
 
+//sounds used
 let miss1;
 let miss2;
 let miss3;
 let miss4;
 let miss5;
-let video;
+let sound;
 
 function preload() {
   miss1 = loadSound("guitarHeroFailed1.mp3");
+  miss1.setVolume(0.3)
   miss2 = loadSound("guitarHeroFailed2.mp3");
+  miss2.setVolume(0.3)
   miss3 = loadSound("guitarHeroFailed3.mp3");
+  miss3.setVolume(0.3)
   miss4 = loadSound("guitarHeroFailed4.mp3");
+  miss4.setVolume(0.3)
   miss5 = loadSound("guitarHeroFailed5.mp3");
-  sound = loadSound("circles.mp3");
+  miss5.setVolume(0.3)
+  sound = loadSound("darude.mp3");
 }
 
+//Plays a random miss sound
 function playRandomMiss() {
   var toPlay = random(0,4.99);
   toPlay = int(toPlay);
@@ -73,7 +73,7 @@ function playRandomMiss() {
       miss4.play();
       break;
     case 4:
-      miss4.play();
+      miss5.play();
       break;
     default:
       break;
@@ -101,8 +101,8 @@ function setup()
   drawUserIDScreen();        // draws the user input screen (student number and display size)
 }
 
+// Draws an arrow from base to vec-margin
 function drawArrow(base, vec, color, margin) {
-
   let connectingVector = createVector(vec.x-base.x, vec.y-base.y);
   let weight = 6;
   stroke(color);
@@ -215,22 +215,38 @@ function printAndSavePerformance()
         time_per_target:    time_per_target,
         target_w_penalty:   target_w_penalty,
         fitts_IDs:          fitts_IDs
-  }
+    } 
   
   // Send data to DB (DO NOT CHANGE!)
-  if (BAKE_OFF_DAY)
-  {
-    // Access the Firebase DB
-    if (attempt === 0)
+    if (BAKE_OFF_DAY)
     {
-      firebase.initializeApp(firebaseConfig);
-      database = firebase.database();
+        if (attempt = 0)
+        {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+        }
+        // Add user performance results
+        let db_ref = database.ref("G"+GROUP_NUMBER);
+        db_ref.push(attempt_data);
     }
-    
-    // Add user performance results
-    let db_ref = database.ref("Third Iteration");
-    db_ref.push(attempt_data);
-  }
+    else
+    {
+        // Change the firebase config
+        var firebaseConfig = {
+            apiKey: "AIzaSyAXD8ZiSlhkJmddixMS1u_orycui6TPa3E",
+            authDomain: "bake-off-2-d4b75.firebaseapp.com",
+            databaseURL: "https://bake-off-2-d4b75-default-rtdb.europe-west1.firebasedatabase.app/",
+            storageBucket: "bake-off-2-d4b75.appspot.com"
+        };
+        if (attempt === 0)
+        {
+            firebase.initializeApp(firebaseConfig);
+            database = firebase.database();
+        }
+        // Add user performance results
+        let db_ref = database.ref("Third Iteration");
+        db_ref.push(attempt_data);
+    }
 
   if (attempt >= 1)
   {
@@ -250,6 +266,8 @@ function printAndSavePerformance()
   }
 }
 
+
+
 // Mouse button was pressed - lets test to see if hit was in the correct target
 function mousePressed() 
 {
@@ -264,12 +282,18 @@ function mousePressed()
     // increasing either the 'hits' or 'misses' counters
     if (dist(target.x, target.y, mouseX, mouseY) < target.w/2) {
       hits++;
-      sound.setVolume(0.4);
+      sound.setVolume(0.1);
+      
+      let d = dist(target.x, target.y, mouseX, mouseY)/ target.w;
+     let res = round(Math.log2(d +1), 3);     
+     fitts_IDs[current_trial+1] = res;
+      
     }
     else {
       misses++;
+      fitts_IDs[current_trial+1] = -1;
       playRandomMiss();
-      sound.setVolume(0.1);
+      sound.setVolume(0.01);
     }
     current_trial++;                 // Move on to the next trial/target
     
@@ -305,15 +329,14 @@ function drawTarget(i)
   // Check whether this target is the target the user should be trying to select
   if (trials[current_trial] == i) 
   {
+    stroke(color(255,255,255));
+    strokeWeight(2);
     fill(color(224, 202, 60));
     // Highlights the target the user should be trying to select
     // with a white border
     if (trials[current_trial + 1 ] == i) {
       stroke(color(217, 196, 76));
-      strokeWeight(6);
-    }
-    else {
-      noStroke();
+      strokeWeight(4);
     }
     circle(target.x, target.y, target.w);
     if (dist(target.x, target.y, mouseX, mouseY) < target.w/2) {
@@ -413,7 +436,4 @@ function windowResized()
   
   // Starts drawing targets immediately after we go fullscreen
   draw_targets = true;
-
-  sound.play();
-  sound.setVolume(0.4);
 }

@@ -79,6 +79,7 @@ function startTest()
     display_size = parseInt(display_size_form.value());
 
     // Deletes UI elements
+    sound.play();
     main_text.remove();
     student_ID_form.remove();
     student_ID_label.remove();
